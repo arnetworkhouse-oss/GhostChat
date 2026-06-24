@@ -637,12 +637,24 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 
 /* Image messages */
 .msg-image {
-  max-width: 220px;
+  display: block;
+  max-width: 260px;
+  width: 100%;
   border-radius: 12px;
   cursor: pointer;
   transition: opacity 0.2s;
 }
 .msg-image:hover { opacity: 0.88; }
+
+/* Bubble containing only media — flush, no padding */
+.msg-bubble.media-bubble {
+  padding: 0;
+  overflow: hidden;
+  background: transparent !important;
+  border: none !important;
+}
+.msg-group.me .msg-bubble.media-bubble { border-radius: 18px 18px 4px 18px; }
+.msg-group.them .msg-bubble.media-bubble { border-radius: 18px 18px 18px 4px; }
 
 /* File attachment */
 .msg-file {
@@ -674,6 +686,144 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .msg-file-size { font-size: 0.68rem; color: var(--text3); margin-top: 1px; }
 .msg-file-dl { margin-left: auto; color: var(--ghost); flex-shrink: 0; }
 .msg-file-dl svg { width: 16px; height: 16px; }
+
+/* ── Media picker sheet ── */
+.media-sheet {
+  position: fixed; inset: 0; z-index: 600;
+  display: flex; flex-direction: column; justify-content: flex-end;
+}
+.media-sheet.hidden { display: none; }
+.media-sheet-backdrop {
+  position: absolute; inset: 0; background: rgba(0,0,0,0.55);
+}
+.media-sheet-card {
+  position: relative; background: var(--bg2);
+  border-radius: 20px 20px 0 0; padding: 16px 16px 32px;
+  border-top: 1px solid var(--border);
+}
+.media-sheet-title {
+  font-size: 0.7rem; color: var(--text3); text-align: center;
+  letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 14px;
+}
+.media-sheet-options {
+  display: flex; gap: 12px; justify-content: center; margin-bottom: 18px;
+}
+.media-sheet-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 7px;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 14px; padding: 14px 18px;
+  color: var(--text); cursor: pointer; min-width: 80px;
+  transition: border-color 0.15s, background 0.15s;
+}
+.media-sheet-btn:hover, .media-sheet-btn:active { border-color: var(--ghost); background: var(--ghost-glow); color: var(--ghost); }
+.media-sheet-btn svg { width: 26px; height: 26px; }
+.media-sheet-btn span { font-size: 0.72rem; }
+
+/* view-mode bar (1x / 2x / keep) */
+.media-view-mode {
+  display: flex; gap: 8px; justify-content: center; align-items: center;
+  margin-top: 4px;
+}
+.media-view-mode-label { font-size: 0.68rem; color: var(--text3); margin-right: 4px; }
+.view-mode-btn {
+  font-size: 0.7rem; padding: 4px 11px; border-radius: 20px;
+  border: 1px solid var(--border); background: var(--bg3); color: var(--text2);
+  cursor: pointer; transition: all 0.15s;
+}
+.view-mode-btn.active { border-color: var(--ghost); background: var(--ghost-glow); color: var(--ghost); }
+
+/* Camera preview modal */
+.camera-modal {
+  position: fixed; inset: 0; z-index: 700;
+  background: #000; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+.camera-modal.hidden { display: none; }
+.camera-video { width: 100%; max-height: 70vh; object-fit: cover; }
+.camera-controls {
+  display: flex; gap: 24px; align-items: center; margin-top: 24px;
+}
+.camera-snap-btn {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: #fff; border: 4px solid var(--ghost);
+  cursor: pointer; transition: transform 0.1s;
+}
+.camera-snap-btn:active { transform: scale(0.92); }
+.camera-cancel-btn {
+  background: var(--bg3); border: 1px solid var(--border);
+  color: var(--text); padding: 10px 22px; border-radius: 20px; cursor: pointer;
+}
+.camera-preview-img { max-height: 70vh; border-radius: 10px; }
+
+/* View-once / view-twice — tap-to-open card */
+.msg-viewonce-wrap { position: relative; display: inline-block; }
+.msg-viewonce-cover {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 8px; cursor: pointer;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 14px; padding: 22px 32px;
+  min-width: 160px;
+  transition: border-color 0.15s, background 0.15s;
+}
+.msg-viewonce-cover:hover { border-color: var(--ghost); background: var(--ghost-glow); }
+.msg-viewonce-cover .vo-icon { font-size: 2rem; }
+.msg-viewonce-cover .vo-label { font-size: 0.75rem; color: var(--text2); }
+.msg-viewonce-cover.exhausted { cursor: default; opacity: 0.5; }
+.msg-viewonce-cover.exhausted:hover { border-color: var(--border); background: var(--bg3); }
+.msg-viewonce-badge { font-size: 0.62rem; color: var(--text3); margin-top: 3px; text-align: center; }
+
+/* Instagram-style fullscreen viewer */
+.vo-viewer {
+  position: fixed; inset: 0; z-index: 900;
+  background: #000;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+.vo-viewer.hidden { display: none; }
+
+/* Progress bar(s) at top */
+.vo-progress-bar-wrap {
+  position: absolute; top: 0; left: 0; right: 0;
+  display: flex; gap: 4px; padding: 12px 12px 0;
+  z-index: 10;
+}
+.vo-progress-seg {
+  flex: 1; height: 3px; border-radius: 2px;
+  background: rgba(255,255,255,0.3); overflow: hidden;
+}
+.vo-progress-fill {
+  height: 100%; width: 0%; border-radius: 2px;
+  background: #fff;
+  transition: none;
+}
+.vo-progress-fill.active { transition: width linear; }
+.vo-progress-fill.done   { width: 100% !important; }
+
+/* Close button */
+.vo-close {
+  position: absolute; top: 20px; right: 16px; z-index: 11;
+  background: rgba(0,0,0,0.5); border: none; color: #fff;
+  width: 36px; height: 36px; border-radius: 50%;
+  font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+
+/* Media inside viewer */
+.vo-viewer img, .vo-viewer video {
+  max-width: 100vw; max-height: 100vh;
+  object-fit: contain;
+}
+
+/* Swipe-down hint */
+.vo-hint {
+  position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
+  font-size: 0.7rem; color: rgba(255,255,255,0.4);
+}
+
+/* Video message */
+.msg-video {
+  max-width: 260px; border-radius: 12px; cursor: pointer;
+  display: block;
+}
 
 /* ── Message hover/quote actions (WhatsApp-style) ── */
 .msg-bubble-wrap {
@@ -878,6 +1028,91 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   transition: border-color 0.2s;
 }
 #chat-textarea:focus { border-color: var(--ghost-dim); }
+
+/* ── Voice message ── */
+.btn-mic {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--ghost); border: none;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
+  transition: transform 0.15s, background 0.15s, box-shadow 0.15s;
+}
+.btn-mic svg { width: 18px; height: 18px; color: #000; }
+.btn-mic:active { transform: scale(0.93); }
+.btn-mic.recording {
+  background: var(--danger);
+  box-shadow: 0 0 0 8px rgba(255,92,92,0.2);
+  animation: micPulse 1s infinite;
+}
+@keyframes micPulse {
+  0%,100% { box-shadow: 0 0 0 6px rgba(255,92,92,0.2); }
+  50%      { box-shadow: 0 0 0 14px rgba(255,92,92,0.05); }
+}
+
+/* Recording overlay bar */
+.voice-record-bar {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  height: var(--input-h);
+  background: var(--bg2); border-top: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px; padding: 0 16px;
+  z-index: 10;
+}
+.voice-record-bar.hidden { display: none; }
+.voice-rec-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--danger); flex-shrink: 0;
+  animation: recBlink 1s infinite;
+}
+@keyframes recBlink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+.voice-rec-timer { font-size: 0.85rem; color: var(--text2); min-width: 40px; }
+.voice-waveform {
+  flex: 1; display: flex; align-items: center; gap: 2px; height: 28px; overflow: hidden;
+}
+.voice-waveform-bar {
+  width: 3px; border-radius: 2px; background: var(--ghost);
+  animation: waveAnim 0.6s ease-in-out infinite alternate;
+  min-height: 4px;
+}
+@keyframes waveAnim { from { height: 4px; } to { height: 24px; } }
+.voice-rec-cancel {
+  font-size: 0.75rem; color: var(--text3); cursor: pointer;
+  padding: 4px 8px; border-radius: 8px;
+  background: none; border: 1px solid var(--border);
+}
+.voice-rec-cancel:hover { color: var(--danger); border-color: var(--danger); }
+.voice-rec-send {
+  font-size: 0.75rem; color: #0a0f0b; cursor: pointer;
+  padding: 4px 12px; border-radius: 8px;
+  background: var(--ghost); border: none; font-weight: 700;
+  transition: background 0.15s;
+}
+.voice-rec-send:hover { background: #7dffaa; }
+
+/* Audio message bubble */
+.msg-audio {
+  display: flex; align-items: center; gap: 10px;
+  min-width: 200px; max-width: 280px;
+}
+.msg-audio-play {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--ghost); border: none; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+.msg-audio-play svg { width: 14px; height: 14px; color: #000; }
+.msg-audio-play.playing { background: var(--ghost-dim); }
+.msg-audio-progress-wrap {
+  flex: 1; display: flex; flex-direction: column; gap: 4px;
+}
+.msg-audio-bar {
+  width: 100%; height: 4px; background: var(--border);
+  border-radius: 2px; overflow: hidden; cursor: pointer;
+}
+.msg-audio-bar-fill {
+  height: 100%; background: var(--ghost); border-radius: 2px;
+  width: 0%; transition: width 0.1s linear;
+}
+.msg-audio-time { font-size: 0.65rem; color: var(--text3); }
 
 /* ══════════════════════════════════
    GHOST MODE OVERLAY — stealth reader
@@ -1773,15 +2008,27 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
-    <div class="chat-input-bar">
+    <div class="chat-input-bar" style="position:relative;">
       <button id="btn-attach" class="icon-btn attach-btn" title="Attach file or image">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       </button>
-      <input type="file" id="file-input" accept="image/*,*/*" style="display:none" />
+      <input type="file" id="file-input-gallery" accept="image/*,video/*" style="display:none" />
+      <input type="file" id="file-input-any" accept="*/*" style="display:none" />
       <textarea id="chat-textarea" placeholder="Type a message..." rows="1"></textarea>
       <button id="btn-send" class="btn btn-send" title="Send">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
       </button>
+      <button id="btn-mic" class="btn-mic" title="Click to record voice">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      </button>
+      <!-- Voice recording bar (slides up over input) -->
+      <div id="voice-record-bar" class="voice-record-bar hidden">
+        <div class="voice-rec-dot"></div>
+        <span id="voice-rec-timer" class="voice-rec-timer">0:00</span>
+        <div class="voice-waveform" id="voice-waveform"></div>
+        <button id="voice-rec-cancel" class="voice-rec-cancel">✕ Cancel</button>
+        <button id="voice-rec-send" class="voice-rec-send">⬆ Send</button>
+      </div>
     </div>
   </div>
 
@@ -1910,6 +2157,53 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
     </div>
   </div>
 
+  <!-- Media picker sheet -->
+  <div id="media-sheet" class="media-sheet hidden">
+    <div class="media-sheet-backdrop" id="media-sheet-backdrop"></div>
+    <div class="media-sheet-card">
+      <div class="media-sheet-title">Send media</div>
+      <div class="media-sheet-options">
+        <button class="media-sheet-btn" id="ms-gallery">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span>Gallery</span>
+        </button>
+        <button class="media-sheet-btn" id="ms-camera">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <span>Camera</span>
+        </button>
+        <button class="media-sheet-btn" id="ms-file">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span>File</span>
+        </button>
+      </div>
+      <div class="media-view-mode">
+        <span class="media-view-mode-label">View:</span>
+        <button class="view-mode-btn active" data-mode="keep">Keep</button>
+        <button class="view-mode-btn" data-mode="once">👁 Once</button>
+        <button class="view-mode-btn" data-mode="twice">👁👁 Twice</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Camera modal -->
+  <div id="camera-modal" class="camera-modal hidden">
+    <video id="camera-video" class="camera-video" autoplay playsinline muted></video>
+    <img id="camera-preview" class="camera-preview-img hidden" alt="Preview" />
+    <div class="camera-controls">
+      <button class="camera-cancel-btn" id="camera-cancel">Cancel</button>
+      <button class="camera-snap-btn" id="camera-snap" title="Take photo"></button>
+      <button class="camera-cancel-btn hidden" id="camera-send-btn">Send</button>
+    </div>
+  </div>
+
+  <!-- Instagram-style view-once/twice fullscreen viewer -->
+  <div id="vo-viewer" class="vo-viewer hidden">
+    <div class="vo-progress-bar-wrap" id="vo-progress-bar-wrap"></div>
+    <button class="vo-close" id="vo-close">✕</button>
+    <div id="vo-media-wrap"></div>
+    <div class="vo-hint">Swipe down to close</div>
+  </div>
+
   <!-- Toast -->
   <div id="toast" class="toast hidden"></div>
 
@@ -1939,6 +2233,14 @@ import {
   where, getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 // Firebase Storage disabled (Spark plan — upgrade to Blaze to enable file uploads)
+
+// ═══════════════════════════════════════════════════════════
+// CLOUDINARY CONFIG — replace these with your own values
+// ═══════════════════════════════════════════════════════════
+const CLOUDINARY = {
+  cloudName:    'ddmuzstza',
+  uploadPreset: 'ghostchat',
+};
 
 const firebaseConfig = {
   apiKey:            "AIzaSyBS8OSCWA7AFLkKVYF_sCky8eQLPO1j7bM",
@@ -2005,6 +2307,11 @@ function fmtBytes(b) {
   return `${(b/1048576).toFixed(1)} MB`;
 }
 
+function fmtAudioTime(s) {
+  s = Math.floor(s || 0);
+  return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+}
+
 /** Format timestamp */
 function fmtTime(ts) {
   if (!ts) return '';
@@ -2036,7 +2343,23 @@ function hideJoinLoader() {
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  // Push a history entry so mobile back button stays in-app
+  if (history.state?.screen !== id) {
+    history.pushState({ screen: id }, '', '');
+  }
 }
+
+// Mobile back button: navigate to join screen instead of closing app
+window.addEventListener('popstate', function(e) {
+  const target = e.state?.screen;
+  if (!target || target === 'screen-join') {
+    showScreen('screen-join');
+    // Re-push so repeated back presses don't close the app
+    history.pushState({ screen: 'screen-join' }, '', '');
+  } else {
+    showScreen(target);
+  }
+});
 
 /** Get file type icon */
 function fileIcon(name = '') {
@@ -2067,7 +2390,7 @@ const els = {
   chatTextarea:     $('chat-textarea'),
   btnSend:          $('btn-send'),
   btnAttach:        $('btn-attach'),
-  fileInput:        $('file-input'),
+  fileInput:        $('file-input-gallery'),
   typingIndicator:  $('typing-indicator'),
   typingText:       $('typing-text'),
   btnGhostToggle:   $('btn-ghost-toggle'),
@@ -2111,29 +2434,46 @@ const els = {
 
 // ═══════════════════════════════════════════════════════════
 // EPHEMERAL CLEANUP
-// Fires on: pagehide, beforeunload, explicit leaveChat()
 // ═══════════════════════════════════════════════════════════
+
+/**
+ * Lightweight cleanup — removes only THIS user's presence + typing docs.
+ * Safe to call on pagehide/beforeunload (tab close, background, screen lock).
+ * Does NOT delete the room or messages — other users are still in there.
+ */
 async function cleanupSession() {
   if (!state.userId || !state.roomId) return;
   stopPresenceHeartbeat();
   try {
     const batch = writeBatch(db);
+    batch.delete(doc(db, 'rooms', state.roomId, 'presence', state.userId));
+    batch.delete(doc(db, 'rooms', state.roomId, 'typing',   state.userId));
+    await batch.commit();
+  } catch (e) {
+    console.warn('Cleanup error:', e);
+  }
+}
 
-    // Remove user presence from room
-    const presenceRef = doc(db, 'rooms', state.roomId, 'presence', state.userId);
-    batch.delete(presenceRef);
-
-    // Remove typing indicator
-    const typingRef = doc(db, 'rooms', state.roomId, 'typing', state.userId);
-    batch.delete(typingRef);
-
+/**
+ * Full cleanup — removes presence, then deletes room if truly empty.
+ * Only called from explicit leaveChat() (user tapped the back button).
+ */
+async function cleanupSessionAndMaybeDeleteRoom() {
+  if (!state.userId || !state.roomId) return;
+  stopPresenceHeartbeat();
+  try {
+    const batch = writeBatch(db);
+    batch.delete(doc(db, 'rooms', state.roomId, 'presence', state.userId));
+    batch.delete(doc(db, 'rooms', state.roomId, 'typing',   state.userId));
     await batch.commit();
 
-    // Check if room is empty → delete entire room + messages
-    const presenceSnap = await getDocs(
-      collection(db, 'rooms', state.roomId, 'presence')
-    );
-    if (presenceSnap.empty) {
+    // Wait briefly so Firestore propagates the delete before we re-read presence
+    await new Promise(r => setTimeout(r, 300));
+
+    // Only wipe room+messages if every other user is also gone
+    const presenceSnap = await getDocs(collection(db, 'rooms', state.roomId, 'presence'));
+    const anyActive = presenceSnap.docs.some(d => isPresenceActive(d.data()));
+    if (!anyActive && presenceSnap.empty) {
       await deleteRoomData(state.roomId);
     }
   } catch (e) {
@@ -2156,18 +2496,14 @@ async function deleteRoomData(roomId) {
   // Storage cleanup skipped (Storage not enabled)
 }
 
-// Register cleanup hooks — only on REAL unload (close/navigate), not on background/minimize.
-// visibilitychange('hidden') fires on tab-switch, app-switch, screen lock — wiping presence there
-// kicked people out of the member list (and could even delete the room) just for backgrounding the app.
+// pagehide = tab close, background, screen lock — only remove presence, never delete room
 window.addEventListener('pagehide', cleanupSession);
 window.addEventListener('beforeunload', e => {
-  // Warn before refresh/close — leaving wipes the ephemeral session (room/messages on solo leave)
   if (state.userId && state.roomId) {
     e.preventDefault();
-    e.returnValue = ''; // required for the native browser confirm dialog to appear
-    // Fire-and-forget; async cleanup above handles the real work if the user proceeds
+    e.returnValue = '';
     navigator.sendBeacon?.('/dev/null');
-    cleanupSession();
+    cleanupSession(); // safe — no room deletion
     return '';
   }
 });
@@ -2346,47 +2682,52 @@ function enterChat() {
 
 /** Subscribe to messages */
 function subscribeMessages() {
-  // Use a simple collection query — NO orderBy, to avoid requiring a composite Firestore index.
-  // We sort client-side instead, which also handles pending serverTimestamp() nulls gracefully.
   const q = collection(db, 'rooms', state.roomId, 'messages');
-
-  // Track rendered message IDs to avoid duplicates
   const rendered = new Set();
 
-  state.unsubMessages = onSnapshot(q, { includeMetadataChanges: false }, snap => {
-    let newestIsMe = false;
-    let hasNewMsg = false;
+  const attach = () => {
+    state.unsubMessages?.(); // unsub any previous listener before re-attaching
 
-    // Collect all new docs first, sort by createdAt (nulls last = pending writes go to bottom)
-    const newDocs = [];
-    snap.docChanges().forEach(change => {
-      if (change.type === 'added') {
-        if (!rendered.has(change.doc.id)) {
-          rendered.add(change.doc.id);
-          newDocs.push(change.doc);
-          hasNewMsg = true;
+    state.unsubMessages = onSnapshot(q, { includeMetadataChanges: false }, snap => {
+      const newDocs = [];
+      let newestIsMe = false;
+      let hasNewMsg  = false;
+
+      snap.docChanges().forEach(change => {
+        if (change.type === 'added') {
+          if (!rendered.has(change.doc.id)) {
+            rendered.add(change.doc.id);
+            newDocs.push(change.doc);
+            hasNewMsg = true;
+          }
+        } else if (change.type === 'modified') {
+          updateMessageStatus(change.doc.id, change.doc.data());
         }
-      } else if (change.type === 'modified') {
-        updateMessageStatus(change.doc.id, change.doc.data());
-      }
-    });
+      });
 
-    // Sort new docs chronologically before rendering
-    newDocs.sort((a, b) => {
-      const ta = a.data().createdAt?.toMillis?.() ?? a.data().clientTs ?? 0;
-      const tb = b.data().createdAt?.toMillis?.() ?? b.data().clientTs ?? 0;
-      return ta - tb;
-    });
+      // Sort chronologically before rendering (no Firestore index needed)
+      newDocs.sort((a, b) => {
+        const ta = a.data().createdAt?.toMillis?.() ?? a.data().clientTs ?? 0;
+        const tb = b.data().createdAt?.toMillis?.() ?? b.data().clientTs ?? 0;
+        return ta - tb;
+      });
 
-    newDocs.forEach(d => {
-      const data = d.data();
-      renderMessage(d.id, data);
-      newestIsMe = data.senderId === state.userId;
-    });
+      newDocs.forEach(d => {
+        renderMessage(d.id, d.data());
+        newestIsMe = d.data().senderId === state.userId;
+      });
 
-    if (hasNewMsg) handleIncomingScroll(newestIsMe);
-    markMessagesSeen(snap.docs);
-  });
+      if (hasNewMsg) handleIncomingScroll(newestIsMe);
+      markMessagesSeen(snap.docs);
+
+    }, err => {
+      // Listener died (network/permissions) — retry after 3 s if still in room
+      console.warn('Message listener error:', err);
+      if (state.roomId) setTimeout(attach, 3000);
+    });
+  };
+
+  attach();
 }
 
 /** Subscribe to room presence for participant count */
@@ -2467,7 +2808,7 @@ function subscribePresence() {
         }
       });
     }
-  );
+  , err => console.warn('Presence listener error:', err));
 }
 
 /** Subscribe to typing indicators */
@@ -2487,10 +2828,10 @@ function subscribeTyping() {
           : `${typers.slice(0,-1).join(', ')} and ${typers.at(-1)} are typing...`;
         els.typingText.textContent = label;
         els.typingIndicator.classList.remove('hidden');
-        if (isNearBottom()) scrollToBottom(); // don't yank the view if user scrolled up reading old chats
+        if (isNearBottom()) scrollToBottom();
       }
     }
-  );
+  , err => console.warn('Typing listener error:', err));
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -2502,7 +2843,11 @@ function renderMessage(msgId, data) {
     const pill = document.createElement('div');
     pill.className = 'system-msg';
     pill.textContent = data.text;
-    els.chatMessages.insertBefore(pill, els.typingIndicator);
+    if (els.typingIndicator && els.typingIndicator.parentNode === els.chatMessages) {
+      els.chatMessages.insertBefore(pill, els.typingIndicator);
+    } else {
+      els.chatMessages.appendChild(pill);
+    }
     scrollToBottom();
     return;
   }
@@ -2556,14 +2901,51 @@ function renderMessage(msgId, data) {
     textSpan.textContent = data.text;
     bubble.appendChild(textSpan);
 
-  } else if (data.type === 'image') {
-    const img = document.createElement('img');
-    img.src = data.url;
-    img.alt = data.fileName || 'image';
-    img.className = 'msg-image';
-    img.loading = 'lazy';
-    img.onclick = () => window.open(data.url, '_blank');
-    bubble.appendChild(img);
+  } else if (data.type === 'image' || data.type === 'video') {
+    const vm = data.viewMode || 'keep';
+    const isViewLimited = vm !== 'keep';
+    const voKey = `vo_${msgId}`;
+    const viewedCount = parseInt(sessionStorage.getItem(voKey) || '0');
+    const maxViews = vm === 'once' ? 1 : vm === 'twice' ? 2 : Infinity;
+    const exhausted = isViewLimited && viewedCount >= maxViews;
+
+    if (isViewLimited) {
+      // Show tap-to-open card (no preview thumbnail)
+      const voWrap = document.createElement('div');
+      voWrap.className = 'msg-viewonce-wrap';
+      const cover = document.createElement('div');
+      cover.className = 'msg-viewonce-cover' + (exhausted ? ' exhausted' : '');
+      cover.innerHTML = `<div class="vo-icon">${vm === 'once' ? '👁' : '👁👁'}</div>
+        <div class="vo-label">${exhausted ? 'Expired' : (vm === 'once' ? 'View once' : 'View twice')}</div>`;
+      if (!exhausted) {
+        cover.onclick = () => {
+          const newCount = viewedCount + 1;
+          sessionStorage.setItem(voKey, newCount);
+          openVoViewer(data, vm, newCount, maxViews, cover, badge);
+        };
+      }
+      voWrap.appendChild(cover);
+      bubble.appendChild(voWrap);
+      const badge = document.createElement('div');
+      badge.className = 'msg-viewonce-badge';
+      badge.textContent = exhausted ? '— expired —' : (vm === 'once' ? '— view once —' : '— view twice —');
+      bubble.appendChild(badge);
+    } else {
+      // Normal media — flush bubble
+      bubble.classList.add('media-bubble');
+      if (data.type === 'video') {
+        const vid = document.createElement('video');
+        vid.src = data.url; vid.className = 'msg-video';
+        vid.controls = true; vid.preload = 'metadata';
+        bubble.appendChild(vid);
+      } else {
+        const img = document.createElement('img');
+        img.src = data.url; img.alt = data.fileName || 'image';
+        img.className = 'msg-image'; img.loading = 'lazy';
+        img.onclick = () => window.open(data.url, '_blank');
+        bubble.appendChild(img);
+      }
+    }
 
   } else if (data.type === 'file') {
     const a = document.createElement('a');
@@ -2585,8 +2967,92 @@ function renderMessage(msgId, data) {
         </svg>
       </span>`;
     bubble.appendChild(a);
+
+  } else if (data.type === 'audio') {
+    // Global active audio tracker (defined once on window)
+    if (!window._gcActiveAudio) window._gcActiveAudio = null;
+
+    const audioEl = new Audio();
+    audioEl.preload = 'metadata';
+    audioEl.src = data.url;
+
+    const wrap2 = document.createElement('div');
+    wrap2.className = 'msg-audio';
+
+    const playBtn = document.createElement('button');
+    playBtn.className = 'msg-audio-play';
+    const SVG_PLAY  = `<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>`;
+    const SVG_PAUSE = `<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>`;
+    playBtn.innerHTML = SVG_PLAY;
+
+    const progWrap = document.createElement('div');
+    progWrap.className = 'msg-audio-progress-wrap';
+    const barOuter = document.createElement('div');
+    barOuter.className = 'msg-audio-bar';
+    const barFill = document.createElement('div');
+    barFill.className = 'msg-audio-bar-fill';
+    barOuter.appendChild(barFill);
+    const timeEl = document.createElement('div');
+    timeEl.className = 'msg-audio-time';
+    timeEl.textContent = fmtAudioTime(data.duration || 0);
+    progWrap.appendChild(barOuter);
+    progWrap.appendChild(timeEl);
+
+    const setPlayIcon  = () => { playBtn.classList.remove('playing'); playBtn.innerHTML = SVG_PLAY; };
+    const setPauseIcon = () => { playBtn.classList.add('playing');    playBtn.innerHTML = SVG_PAUSE; };
+
+    playBtn.onclick = () => {
+      if (audioEl.paused) {
+        // Pause whichever audio is currently playing
+        if (window._gcActiveAudio && window._gcActiveAudio !== audioEl) {
+          window._gcActiveAudio.pause();
+        }
+        window._gcActiveAudio = audioEl;
+        audioEl.play().catch(() => {});
+        setPauseIcon();
+      } else {
+        audioEl.pause();
+        setPlayIcon();
+      }
+    };
+
+    audioEl.ontimeupdate = () => {
+      if (!audioEl.duration || isNaN(audioEl.duration)) return;
+      barFill.style.width = (audioEl.currentTime / audioEl.duration * 100) + '%';
+      timeEl.textContent = fmtAudioTime(audioEl.currentTime);
+    };
+
+    audioEl.onpause = () => {
+      setPlayIcon();
+      if (window._gcActiveAudio === audioEl) window._gcActiveAudio = null;
+    };
+
+    audioEl.onended = () => {
+      setPlayIcon();
+      barFill.style.width = '0%';
+      timeEl.textContent = fmtAudioTime(data.duration || 0);
+      if (window._gcActiveAudio === audioEl) window._gcActiveAudio = null;
+    };
+
+    audioEl.onerror = () => {
+      timeEl.textContent = 'error';
+      playBtn.disabled = true;
+      playBtn.style.opacity = '0.4';
+    };
+
+    // Seek on bar click (safe — only when duration known)
+    barOuter.onclick = e => {
+      if (!audioEl.duration || isNaN(audioEl.duration)) return;
+      const rect = barOuter.getBoundingClientRect();
+      audioEl.currentTime = ((e.clientX - rect.left) / rect.width) * audioEl.duration;
+    };
+
+    wrap2.appendChild(playBtn);
+    wrap2.appendChild(progWrap);
+    bubble.appendChild(wrap2);
   }
 
+  // Attach bubble to wrap
   wrap.appendChild(bubble);
 
   // Hover action bar (desktop): reply + copy
@@ -2625,7 +3091,11 @@ function renderMessage(msgId, data) {
 
   // Insert before typing indicator (always keep typing at bottom)
   const typing = els.typingIndicator;
-  els.chatMessages.insertBefore(group, typing);
+  if (typing && typing.parentNode === els.chatMessages) {
+    els.chatMessages.insertBefore(group, typing);
+  } else {
+    els.chatMessages.appendChild(group);
+  }
 
   // Mirror to ghost mini-chat if ghost mode active
   if (state.ghostMode) {
@@ -2688,6 +3158,8 @@ function msgPreviewText(data) {
   if (!data) return '';
   if (data.type === 'text')  return data.text || '';
   if (data.type === 'image') return '📷 Photo';
+  if (data.type === 'video') return '🎥 Video';
+  if (data.type === 'audio') return '🎤 Voice message';
   if (data.type === 'file')  return `📁 ${data.fileName || 'File'}`;
   return '';
 }
@@ -2887,20 +3359,21 @@ function updateMessageStatus(msgId, data) {
   statusEl.textContent = statusEmoji(data.status);
 }
 
-/** Mark received messages as seen */
+/** Mark received messages as seen — debounced, skips system msgs + already-seen */
 async function markMessagesSeen(docs) {
-  // Debounce
   clearTimeout(state.seenTimer);
   state.seenTimer = setTimeout(async () => {
-    const batch = writeBatch(db);
-    docs.forEach(d => {
+    const toUpdate = docs.filter(d => {
       const data = d.data();
-      if (data.senderId !== state.userId && data.status !== 'seen') {
-        batch.update(d.ref, { status: 'seen' });
-      }
+      return data.senderId !== state.userId
+          && data.type !== 'system'
+          && data.status !== 'seen';
     });
+    if (!toUpdate.length) return;
+    const batch = writeBatch(db);
+    toUpdate.forEach(d => batch.update(d.ref, { status: 'seen' }));
     try { await batch.commit(); } catch {}
-  }, 800);
+  }, 1500); // longer debounce — reduces write storm
 }
 
 function scrollToBottom() {
@@ -2978,11 +3451,163 @@ async function sendMessage(text) {
   clearTyping();
 }
 
+async function sendMediaMessage({ type, url, fileName, fileSize, viewMode = 'keep' }) {
+  const msgData = {
+    type,
+    url,
+    fileName:   fileName || '',
+    fileSize:   fileSize || 0,
+    viewMode,
+    senderId:   state.userId,
+    senderName: state.username,
+    status:     'sent',
+    createdAt:  serverTimestamp(),
+    clientTs:   Date.now(),
+  };
+  if (state.replyTo) {
+    msgData.replyTo = {
+      msgId:      state.replyTo.msgId,
+      senderName: state.replyTo.senderName,
+      text:       state.replyTo.text,
+    };
+    cancelReply();
+  }
+  const msgRef = await addDoc(collection(db, 'rooms', state.roomId, 'messages'), msgData);
+  setTimeout(async () => { try { await updateDoc(msgRef, { status: 'delivered' }); } catch {} }, 600);
+}
 // ═══════════════════════════════════════════════════════════
-// FILE / IMAGE UPLOAD
 // ═══════════════════════════════════════════════════════════
-async function uploadFile(file) {
-  showToast('📦 File sharing requires Firebase Storage (Blaze plan). Coming soon!');
+// INSTAGRAM-STYLE VIEW-ONCE VIEWER
+// ═══════════════════════════════════════════════════════════
+function openVoViewer(data, vm, viewedCount, maxViews, cover, badge) {
+  const viewer    = $('vo-viewer');
+  const barWrap   = $('vo-progress-bar-wrap');
+  const mediaWrap = $('vo-media-wrap');
+  const closeBtn  = $('vo-close');
+
+  mediaWrap.innerHTML = '';
+  if (data.type === 'video') {
+    const vid = document.createElement('video');
+    vid.src = data.url; vid.autoplay = true; vid.controls = true;
+    vid.style.cssText = 'max-width:100vw;max-height:90vh;';
+    mediaWrap.appendChild(vid);
+  } else {
+    const img = document.createElement('img');
+    img.src = data.url; img.alt = '';
+    mediaWrap.appendChild(img);
+  }
+
+  const duration  = vm === 'once' ? 8000 : 12000;
+  const totalSegs = vm === 'once' ? 1 : 2;
+  const currentSeg = viewedCount - 1;
+
+  barWrap.innerHTML = '';
+  for (let i = 0; i < totalSegs; i++) {
+    const seg  = document.createElement('div');
+    seg.className = 'vo-progress-seg';
+    const fill = document.createElement('div');
+    fill.className = 'vo-progress-fill' + (i < currentSeg ? ' done' : '');
+    seg.appendChild(fill);
+    barWrap.appendChild(seg);
+  }
+
+  viewer.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+
+  let timerRef = null;
+  const activeFill = barWrap.children[currentSeg]?.querySelector('.vo-progress-fill');
+  if (activeFill) {
+    activeFill.classList.add('active');
+    activeFill.style.transitionDuration = duration + 'ms';
+    requestAnimationFrame(() => requestAnimationFrame(() => { activeFill.style.width = '100%'; }));
+  }
+  timerRef = setTimeout(closeViewer, duration);
+
+  function closeViewer() {
+    clearTimeout(timerRef);
+    viewer.classList.add('hidden');
+    document.body.style.overflow = '';
+    const vid = mediaWrap.querySelector('video');
+    if (vid) { vid.pause(); vid.src = ''; }
+    if (viewedCount >= maxViews) {
+      cover.classList.add('exhausted');
+      cover.querySelector('.vo-label').textContent = 'Expired';
+      cover.onclick = null;
+      if (badge) badge.textContent = '— expired —';
+    }
+  }
+
+  closeBtn.onclick = closeViewer;
+  let touchStartY = 0;
+  viewer.ontouchstart = e => { touchStartY = e.touches[0].clientY; };
+  viewer.ontouchmove  = e => { if (e.touches[0].clientY - touchStartY > 80) closeViewer(); };
+}
+
+async function uploadFile(file, viewMode = 'keep') {
+  if (!CLOUDINARY.cloudName || CLOUDINARY.cloudName === 'YOUR_CLOUD_NAME') {
+    showToast('⚠️ Set your Cloudinary cloudName + uploadPreset in the config!');
+    return;
+  }
+
+  const isImage = file.type.startsWith('image/');
+  const isVideo = file.type.startsWith('video/');
+  const maxBytes = isVideo ? 100 * 1024 * 1024 : 25 * 1024 * 1024;
+  if (file.size > maxBytes) {
+    showToast(`⚠️ File too large (max ${isVideo ? '100MB' : '25MB'})`);
+    return;
+  }
+
+  // Show progress bar
+  els.uploadProgress.classList.remove('hidden');
+  els.uploadBarFill.style.width = '0%';
+  els.uploadLabel.textContent = 'Uploading…';
+
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('upload_preset', CLOUDINARY.uploadPreset);
+  fd.append('folder', 'ghostchat');
+
+  const resourceType = isVideo ? 'video' : 'auto';
+  const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY.cloudName}/${resourceType}/upload`;
+
+  try {
+    const xhr = new XMLHttpRequest();
+    await new Promise((resolve, reject) => {
+      xhr.upload.onprogress = e => {
+        if (e.lengthComputable) {
+          const pct = Math.round((e.loaded / e.total) * 90);
+          els.uploadBarFill.style.width = pct + '%';
+          els.uploadLabel.textContent = `Uploading… ${pct}%`;
+        }
+      };
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) resolve(xhr.responseText);
+        else reject(new Error('Upload failed: ' + xhr.status));
+      };
+      xhr.onerror = () => reject(new Error('Network error'));
+      xhr.open('POST', url);
+      xhr.send(fd);
+    });
+
+    els.uploadBarFill.style.width = '100%';
+    const result = JSON.parse(xhr.responseText);
+    const mediaUrl = result.secure_url;
+    const msgType = isVideo ? 'video' : (isImage ? 'image' : 'file');
+
+    await sendMediaMessage({
+      type: msgType,
+      url: mediaUrl,
+      fileName: file.name,
+      fileSize: file.size,
+      viewMode,
+    });
+
+  } catch (err) {
+    showToast('Upload failed: ' + err.message);
+    console.error(err);
+  } finally {
+    setTimeout(() => els.uploadProgress.classList.add('hidden'), 800);
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -3449,7 +4074,7 @@ async function leaveChat() {
   // Hide any disconnect popup
   hideDisconnectPopup();
 
-  await cleanupSession();
+  await cleanupSessionAndMaybeDeleteRoom(); // full cleanup — may delete room if empty
 
   // Reset state
   state.roomId = null;
@@ -3555,18 +4180,206 @@ function bindEvents() {
     }
   });
 
-  // File attach
-  els.btnAttach.onclick = () => els.fileInput.click();
-  els.fileInput.onchange = async () => {
-    const file = els.fileInput.files[0];
+  // Media picker sheet
+  let currentViewMode = 'keep';
+
+  els.btnAttach.onclick = () => $('media-sheet').classList.remove('hidden');
+  $('media-sheet-backdrop').onclick = () => $('media-sheet').classList.add('hidden');
+
+  // View mode toggle
+  $('media-sheet').querySelectorAll('.view-mode-btn').forEach(btn => {
+    btn.onclick = () => {
+      $('media-sheet').querySelectorAll('.view-mode-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentViewMode = btn.dataset.mode;
+    };
+  });
+
+  // Gallery
+  $('ms-gallery').onclick = () => { $('file-input-gallery').click(); $('media-sheet').classList.add('hidden'); };
+  $('file-input-gallery').onchange = async () => {
+    const file = $('file-input-gallery').files[0];
     if (!file) return;
-    if (file.size > 25 * 1024 * 1024) {
-      showToast('File too large (max 25 MB)');
-      return;
-    }
-    await uploadFile(file);
-    els.fileInput.value = '';
+    await uploadFile(file, currentViewMode);
+    $('file-input-gallery').value = '';
   };
+
+  // Any file
+  $('ms-file').onclick = () => { $('file-input-any').click(); $('media-sheet').classList.add('hidden'); };
+  $('file-input-any').onchange = async () => {
+    const file = $('file-input-any').files[0];
+    if (!file) return;
+    await uploadFile(file, currentViewMode);
+    $('file-input-any').value = '';
+  };
+
+  // Camera
+  let cameraStream = null;
+  let capturedBlob = null;
+  const cameraModal = $('camera-modal');
+  const camVideo = $('camera-video');
+  const camPreview = $('camera-preview');
+  const camSnap = $('camera-snap');
+  const camSend = $('camera-send-btn');
+  const camCancel = $('camera-cancel');
+
+  $('ms-camera').onclick = async () => {
+    $('media-sheet').classList.add('hidden');
+    try {
+      cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+      camVideo.srcObject = cameraStream;
+      camVideo.classList.remove('hidden');
+      camPreview.classList.add('hidden');
+      camSend.classList.add('hidden');
+      capturedBlob = null;
+      cameraModal.classList.remove('hidden');
+    } catch {
+      showToast('⚠️ Camera not available');
+    }
+  };
+
+  camSnap.onclick = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = camVideo.videoWidth;
+    canvas.height = camVideo.videoHeight;
+    canvas.getContext('2d').drawImage(camVideo, 0, 0);
+    canvas.toBlob(blob => {
+      capturedBlob = blob;
+      camPreview.src = URL.createObjectURL(blob);
+      camVideo.classList.add('hidden');
+      camPreview.classList.remove('hidden');
+      camSend.classList.remove('hidden');
+    }, 'image/jpeg', 0.92);
+  };
+
+  camSend.onclick = async () => {
+    if (!capturedBlob) return;
+    cameraModal.classList.add('hidden');
+    if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
+    const file = new File([capturedBlob], `photo_${Date.now()}.jpg`, { type: 'image/jpeg' });
+    await uploadFile(file, currentViewMode);
+  };
+
+  camCancel.onclick = () => {
+    cameraModal.classList.add('hidden');
+    if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
+  };
+
+  // ── Voice recording ──
+  let mediaRecorder = null;
+  let audioChunks   = [];
+  let recTimerRef   = null;
+  let recSeconds    = 0;
+  let recCancelled  = false;
+  const btnMic       = $('btn-mic');
+  const voiceBar     = $('voice-record-bar');
+  const recTimerEl   = $('voice-rec-timer');
+  const waveformEl   = $('voice-waveform');
+  const recCancelBtn = $('voice-rec-cancel');
+  const recSendBtn  = $('voice-rec-send');
+
+  // Build waveform bars
+  for (let i = 0; i < 28; i++) {
+    const b = document.createElement('div');
+    b.className = 'voice-waveform-bar';
+    b.style.animationDelay = (i * 0.04) + 's';
+    b.style.animationDuration = (0.4 + Math.random() * 0.5) + 's';
+    waveformEl.appendChild(b);
+  }
+
+  async function startRecording() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/ogg';
+      mediaRecorder = new MediaRecorder(stream, { mimeType });
+      audioChunks = []; recSeconds = 0; recCancelled = false;
+      mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+      mediaRecorder.onstop = async () => {
+        stream.getTracks().forEach(t => t.stop());
+        if (recCancelled) return;
+        const blob = new Blob(audioChunks, { type: mimeType });
+        const file = new File([blob], `voice_${Date.now()}.webm`, { type: mimeType });
+        await uploadVoice(file, recSeconds);
+      };
+      mediaRecorder.start(100);
+      btnMic.classList.add('recording');
+      voiceBar.classList.remove('hidden');
+      recTimerRef = setInterval(() => {
+        recSeconds++;
+        recTimerEl.textContent = fmtAudioTime(recSeconds);
+        if (recSeconds >= 120) stopRecording(false); // max 2min
+      }, 1000);
+    } catch {
+      showToast('⚠️ Microphone not available');
+    }
+  }
+
+  function stopRecording(cancel = false) {
+    recCancelled = cancel;
+    clearInterval(recTimerRef);
+    voiceBar.classList.add('hidden');
+    btnMic.classList.remove('recording');
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+  }
+
+  // Desktop: click-to-toggle (click once = start, click again = stop)
+  // Mobile:  hold-to-record (touchstart = start, touchend = stop)
+  let holdTimer = null;
+  let isTouchAction = false;
+
+  btnMic.addEventListener('click', () => {
+    if (isTouchAction) return; // touch already handled it
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+      stopRecording(false);
+    } else {
+      startRecording();
+    }
+  });
+
+  btnMic.addEventListener('touchstart', e => {
+    e.preventDefault();
+    isTouchAction = true;
+    holdTimer = setTimeout(startRecording, 200);
+  }, { passive: false });
+
+  btnMic.addEventListener('touchend', () => {
+    clearTimeout(holdTimer);
+    if (mediaRecorder?.state === 'recording') stopRecording(false);
+    setTimeout(() => { isTouchAction = false; }, 400);
+  });
+
+  btnMic.addEventListener('touchcancel', () => {
+    clearTimeout(holdTimer);
+    if (mediaRecorder?.state === 'recording') stopRecording(true);
+    setTimeout(() => { isTouchAction = false; }, 400);
+  });
+
+  recCancelBtn.onclick = () => stopRecording(true);
+  recSendBtn.onclick  = () => stopRecording(false);
+
+  async function uploadVoice(file, duration) {
+    els.uploadProgress.classList.remove('hidden');
+    els.uploadBarFill.style.width = '0%';
+    els.uploadLabel.textContent = 'Sending voice…';
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('upload_preset', CLOUDINARY.uploadPreset);
+      fd.append('folder', 'ghostchat');
+      fd.append('resource_type', 'video'); // Cloudinary uses 'video' for audio too
+      const res = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUDINARY.cloudName}/video/upload`,
+        { method: 'POST', body: fd }
+      );
+      const result = await res.json();
+      await sendMediaMessage({ type: 'audio', url: result.secure_url, fileName: file.name, fileSize: file.size, duration });
+      els.uploadBarFill.style.width = '100%';
+    } catch (err) {
+      showToast('Voice upload failed: ' + err.message);
+    } finally {
+      setTimeout(() => els.uploadProgress.classList.add('hidden'), 800);
+    }
+  }
 
   // Ghost mode
   els.btnGhostToggle.onclick = toggleGhostMode;
