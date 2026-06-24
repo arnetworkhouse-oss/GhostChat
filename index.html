@@ -1474,9 +1474,205 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
     bottom: max(80px, calc(60px + env(safe-area-inset-bottom)));
   }
 }
+
+/* ══════════════════════════════════
+   DISCONNECT POPUP
+══════════════════════════════════ */
+.disconnect-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.88);
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  padding: 28px 32px 24px;
+  z-index: 9000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  min-width: 240px;
+  max-width: 320px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(107,255,142,0.06);
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.34,1.56,0.64,1);
+}
+.disconnect-popup.visible {
+  opacity: 1;
+  pointer-events: all;
+  transform: translate(-50%, -50%) scale(1);
+}
+.disconnect-popup-icon {
+  font-size: 2.2rem;
+  line-height: 1;
+  animation: ghostFade 1.6s ease-in-out infinite alternate;
+}
+@keyframes ghostFade {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0.5; transform: translateY(-4px); }
+}
+.disconnect-popup-title {
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+.disconnect-popup-title span {
+  color: var(--ghost);
+}
+.disconnect-popup-sub {
+  font-size: 0.72rem;
+  color: var(--text3);
+  letter-spacing: 0.02em;
+}
+.disconnect-popup-dismiss {
+  margin-top: 6px;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  color: var(--text2);
+  border-radius: 8px;
+  padding: 7px 20px;
+  font-size: 0.78rem;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.disconnect-popup-dismiss:hover {
+  border-color: var(--ghost-dim);
+  color: var(--ghost);
+  background: var(--ghost-glow);
+}
+.disconnect-popup-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 8999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
+}
+.disconnect-popup-backdrop.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ── Join screen info button ── */
+.join-info-btn {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  color: var(--text3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 20;
+  transition: all 0.18s;
+}
+.join-info-btn:hover {
+  color: var(--ghost);
+  border-color: var(--ghost-dim);
+  background: var(--ghost-glow);
+}
+.join-info-btn svg { width: 18px; height: 18px; }
+
+/* ── Floating join loader ── */
+.join-loader-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(13,15,14,0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 8000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
+}
+.join-loader-overlay.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+.join-loader-wrap {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.join-loader-ring {
+  position: absolute;
+  inset: 0;
+  border: 2.5px solid var(--border2);
+  border-top-color: var(--ghost);
+  border-radius: 50%;
+  animation: loaderSpin 0.8s linear infinite;
+}
+@keyframes loaderSpin { to { transform: rotate(360deg); } }
+.join-loader-ghost {
+  font-size: 1.5rem;
+  animation: loaderGhostPulse 1.4s ease-in-out infinite;
+}
+@keyframes loaderGhostPulse {
+  0%,100% { opacity: 0.35; transform: scale(0.88); }
+  50%     { opacity: 1;    transform: scale(1.04); }
+}
+.join-loader-label {
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  color: var(--text3);
+  letter-spacing: 0.06em;
+}
+.join-loader-dots::after {
+  content: '';
+  animation: dotsAnim 1.4s steps(4, end) infinite;
+}
+@keyframes dotsAnim {
+  0%   { content: '';    }
+  25%  { content: '.';   }
+  50%  { content: '..';  }
+  75%  { content: '...'; }
+}
   </style>
 </head>
 <body>
+
+  <!-- Join screen ⓘ info button -->
+  <button id="btn-join-info" class="join-info-btn" title="How to use GhostChat">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+  </button>
+
+  <!-- Floating join loader -->
+  <div id="join-loader" class="join-loader-overlay">
+    <div class="join-loader-wrap">
+      <div class="join-loader-ring"></div>
+      <span class="join-loader-ghost">👻</span>
+    </div>
+    <div class="join-loader-label"><span id="join-loader-text">Connecting</span><span class="join-loader-dots"></span></div>
+  </div>
+
+  <!-- Disconnect popup backdrop + card -->
+  <div id="disconnect-backdrop" class="disconnect-popup-backdrop"></div>
+  <div id="disconnect-popup" class="disconnect-popup">
+    <div class="disconnect-popup-icon">👻</div>
+    <div class="disconnect-popup-title"><span id="disconnect-name">User</span> disconnected</div>
+    <div class="disconnect-popup-sub">They've vanished — no trace left behind.</div>
+    <button class="disconnect-popup-dismiss" id="disconnect-dismiss">Dismiss</button>
+  </div>
 
   <!-- ═══════════════════════════════════════════════
        SCREEN 1: JOIN / LANDING
@@ -1825,6 +2021,17 @@ function showToast(msg, dur = 2000) {
   t._timer = setTimeout(() => t.classList.add('hidden'), dur);
 }
 
+/** Show/hide the floating join loader */
+function showJoinLoader(label = 'Connecting') {
+  const overlay = document.getElementById('join-loader');
+  const text    = document.getElementById('join-loader-text');
+  if (text) text.textContent = label;
+  overlay?.classList.add('visible');
+}
+function hideJoinLoader() {
+  document.getElementById('join-loader')?.classList.remove('visible');
+}
+
 /** Switch visible screen */
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -1983,6 +2190,7 @@ async function createRoom(type) {
   state.roomType = type;
   state.roomCreatedBy = state.userId; // host
 
+  showJoinLoader(type === 'personal' ? 'Creating personal chat...' : 'Creating group chat...');
   try {
     await setDoc(doc(db, 'rooms', state.roomId), {
       code:      state.roomCode,
@@ -1993,8 +2201,20 @@ async function createRoom(type) {
     // Save username to Firebase users collection (best-effort, silent fail)
     try { await setDoc(doc(db, 'users', state.userId), { username: state.username, createdAt: serverTimestamp() }); } catch(_) {}
     await joinRoomPresence();
+
+    // Post system join message so others see "X created this room"
+    await addDoc(collection(db, 'rooms', state.roomId, 'messages'), {
+      type:      'system',
+      text:      `${state.username} created the ${type === 'group' ? 'group' : 'chat'}`,
+      createdAt: serverTimestamp(),
+      clientTs:  Date.now(),
+      senderId:  state.userId,
+    });
+
+    hideJoinLoader();
     enterChat();
   } catch (e) {
+    hideJoinLoader();
     showToast('Error creating room: ' + e.message);
     console.error(e);
   }
@@ -2011,9 +2231,11 @@ async function joinRoom() {
 
   const tempUserId = genId(12);
 
+  showJoinLoader('Joining room...');
   try {
     const roomSnap = await getDoc(doc(db, 'rooms', code));
     if (!roomSnap.exists()) {
+      hideJoinLoader();
       showToast('❌ Room not found. Check the code.');
       return;
     }
@@ -2025,6 +2247,7 @@ async function joinRoom() {
       const presenceSnap = await getDocs(collection(db, 'rooms', code, 'presence'));
       const activeCount = presenceSnap.docs.filter(d => isPresenceActive(d.data())).length;
       if (activeCount >= 2) {
+        hideJoinLoader();
         showToast('🚫 This room is taken. It already has 2 people.', 3500);
         return;
       }
@@ -2055,10 +2278,14 @@ async function joinRoom() {
       type:       'system',
       text:       `${state.username} joined`,
       createdAt:  serverTimestamp(),
+      clientTs:   Date.now(),
       senderId:   state.userId,
     });
+
+    hideJoinLoader();
     enterChat();
   } catch (e) {
+    hideJoinLoader();
     showToast('Error joining room: ' + e.message);
     console.error(e);
   }
@@ -2119,38 +2346,45 @@ function enterChat() {
 
 /** Subscribe to messages */
 function subscribeMessages() {
-  const q = query(
-    collection(db, 'rooms', state.roomId, 'messages'),
-    orderBy('createdAt', 'asc')
-  );
+  // Use a simple collection query — NO orderBy, to avoid requiring a composite Firestore index.
+  // We sort client-side instead, which also handles pending serverTimestamp() nulls gracefully.
+  const q = collection(db, 'rooms', state.roomId, 'messages');
 
   // Track rendered message IDs to avoid duplicates
   const rendered = new Set();
 
-  state.unsubMessages = onSnapshot(q, snap => {
+  state.unsubMessages = onSnapshot(q, { includeMetadataChanges: false }, snap => {
     let newestIsMe = false;
     let hasNewMsg = false;
 
+    // Collect all new docs first, sort by createdAt (nulls last = pending writes go to bottom)
+    const newDocs = [];
     snap.docChanges().forEach(change => {
       if (change.type === 'added') {
         if (!rendered.has(change.doc.id)) {
           rendered.add(change.doc.id);
-          const data = change.doc.data();
-          renderMessage(change.doc.id, data);
+          newDocs.push(change.doc);
           hasNewMsg = true;
-          newestIsMe = data.senderId === state.userId;
         }
       } else if (change.type === 'modified') {
-        // Update status indicators
         updateMessageStatus(change.doc.id, change.doc.data());
       }
     });
 
-    // Scroll to bottom if it's our own message or we're already near the bottom;
-    // otherwise surface the "new messages" pill instead of yanking the view down.
-    if (hasNewMsg) handleIncomingScroll(newestIsMe);
+    // Sort new docs chronologically before rendering
+    newDocs.sort((a, b) => {
+      const ta = a.data().createdAt?.toMillis?.() ?? a.data().clientTs ?? 0;
+      const tb = b.data().createdAt?.toMillis?.() ?? b.data().clientTs ?? 0;
+      return ta - tb;
+    });
 
-    // Mark all incoming messages as seen
+    newDocs.forEach(d => {
+      const data = d.data();
+      renderMessage(d.id, data);
+      newestIsMe = data.senderId === state.userId;
+    });
+
+    if (hasNewMsg) handleIncomingScroll(newestIsMe);
     markMessagesSeen(snap.docs);
   });
 }
@@ -2158,6 +2392,9 @@ function subscribeMessages() {
 /** Subscribe to room presence for participant count */
 function subscribePresence() {
   let initialLoad = true;
+  // Track usernames seen as active so we don't false-fire on stale-doc removals
+  const knownActive = new Set();
+
   state.unsubRoom = onSnapshot(
     collection(db, 'rooms', state.roomId, 'presence'),
     snap => {
@@ -2180,18 +2417,55 @@ function subscribePresence() {
       state.presenceList = activeDocs.map(d => ({ userId: d.id, username: d.data().username }));
       if (!els.participantsModal.classList.contains('hidden')) renderParticipantsList();
 
-      // Host gets notified when new member joins (skip initial snapshot)
-      if (!initialLoad && state.roomCreatedBy === state.userId) {
-        snap.docChanges().forEach(change => {
-          if (change.type === 'added') {
-            const joiner = change.doc.data().username;
-            if (joiner && joiner !== state.username) {
-              showToast(`👤 ${joiner} joined the room`, 3500);
+      if (initialLoad) {
+        // Seed known-active set from current snapshot — no popups on first load
+        activeDocs.forEach(d => knownActive.add(d.id));
+        initialLoad = false;
+        return;
+      }
+
+      // Process changes after initial load
+      snap.docChanges().forEach(change => {
+        const uid  = change.doc.id;
+        const data = change.doc.data();
+
+        if (change.type === 'added' && isPresenceActive(data)) {
+          knownActive.add(uid);
+          // Notify host (and all members in group) of new joiner
+          const joiner = data.username;
+          if (joiner && joiner !== state.username) {
+            if (state.roomType === 'group' || state.roomCreatedBy === state.userId) {
+              showToast(`👤 ${joiner} joined the room`, 3000);
             }
           }
-        });
-      }
-      initialLoad = false;
+        }
+
+        if (change.type === 'removed') {
+          // Only show disconnect popup if we actually knew this person as active
+          if (knownActive.has(uid)) {
+            knownActive.delete(uid);
+            const who = data.username;
+            if (who && who !== state.username) {
+              showDisconnectPopup(who);
+              // Also post a system message in group chats
+              if (state.roomType === 'group') {
+                addDoc(collection(db, 'rooms', state.roomId, 'messages'), {
+                  type:      'system',
+                  text:      `${who} left`,
+                  createdAt: serverTimestamp(),
+                  clientTs:  Date.now(),
+                  senderId:  uid,
+                }).catch(() => {});
+              }
+            }
+          }
+        }
+
+        if (change.type === 'modified') {
+          if (isPresenceActive(data)) knownActive.add(uid);
+          else knownActive.delete(uid);
+        }
+      });
     }
   );
 }
@@ -2677,6 +2951,7 @@ async function sendMessage(text) {
     senderName: state.username,
     status:     'sent',
     createdAt:  serverTimestamp(),
+    clientTs:   Date.now(), // local fallback for ordering before server ts resolves
   };
 
   if (state.replyTo) {
@@ -3129,6 +3404,39 @@ function initDraggable(handle, widget) {
 }
 
 // ═══════════════════════════════════════════════════════════
+// DISCONNECT POPUP
+// ═══════════════════════════════════════════════════════════
+let disconnectDismissTimer = null;
+
+function showDisconnectPopup(username) {
+  const popup    = document.getElementById('disconnect-popup');
+  const backdrop = document.getElementById('disconnect-backdrop');
+  const nameEl   = document.getElementById('disconnect-name');
+  const dismiss  = document.getElementById('disconnect-dismiss');
+
+  if (!popup) return;
+
+  nameEl.textContent = username;
+  popup.classList.add('visible');
+  backdrop.classList.add('visible');
+
+  // Auto-dismiss after 4 s
+  clearTimeout(disconnectDismissTimer);
+  disconnectDismissTimer = setTimeout(hideDisconnectPopup, 4000);
+
+  dismiss.onclick = hideDisconnectPopup;
+  backdrop.onclick = hideDisconnectPopup;
+}
+
+function hideDisconnectPopup() {
+  clearTimeout(disconnectDismissTimer);
+  const popup    = document.getElementById('disconnect-popup');
+  const backdrop = document.getElementById('disconnect-backdrop');
+  popup?.classList.remove('visible');
+  backdrop?.classList.remove('visible');
+}
+
+// ═══════════════════════════════════════════════════════════
 // LEAVE CHAT
 // ═══════════════════════════════════════════════════════════
 async function leaveChat() {
@@ -3137,6 +3445,9 @@ async function leaveChat() {
   state.unsubRoom?.();
   state.unsubTyping?.();
   stopPresenceHeartbeat();
+
+  // Hide any disconnect popup
+  hideDisconnectPopup();
 
   await cleanupSession();
 
@@ -3184,6 +3495,12 @@ function bindEvents() {
   els.btnCreatePersonal.onclick = () => createRoom('personal');
   els.btnCreateGroup.onclick    = () => createRoom('group');
   els.btnJoinRoom.onclick       = joinRoom;
+
+  // Join screen ⓘ info button — opens the same info modal
+  const btnJoinInfo = document.getElementById('btn-join-info');
+  if (btnJoinInfo) {
+    btnJoinInfo.onclick = () => els.infoModal.classList.remove('hidden');
+  }
 
   // Allow Enter key on room code
   els.roomCode.addEventListener('keydown', e => {
